@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Coding SOMU AI | Neural Chat & Prompt Hub</title>
+  
+  <!-- Orbitron & Inter & Fira Code Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@600;700;800;900&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="CSS/style.css">
+ 
+</head>
+<body>
+  <!-- Ambient background glow elements -->
+  <div class="ambient-glow cyan"></div>
+  <div class="ambient-glow magenta"></div>
+
+  <section class="auth-view" id="authScreen" aria-label="User Authentication Section">
+    <div class="auth-wrapper">
+      <div class="card-surface">
+        
+        <!-- LOGIN FORM -->
+        <div class="form-panel active" id="loginPanel">
+          <h1 class="neon-title">WELCOME</h1>
+          <p class="sub-title">Login to your account</p>
+
+          <form id="loginForm" onsubmit="handleAuthSubmit(event, 'login')">
+            <div class="input-group">
+              <input 
+                type="email" 
+                class="auth-input" 
+                placeholder="Email Address" 
+                value="somu@coding.ai"
+                required
+                autocomplete="email"
+              >
+            </div>
+
+            <div class="input-group">
+              <input 
+                type="password" 
+                id="loginPassword" 
+                class="auth-input has-icon" 
+                placeholder="Password" 
+                value="somu1234"
+                required
+                autocomplete="current-password"
+              >
+              <button 
+                type="button" 
+                class="toggle-password" 
+                onclick="togglePassword('loginPassword', this)" 
+                aria-label="Toggle password visibility"
+                title="Show password"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
+
+            <div class="options-row">
+              <label class="remember-box">
+                <input type="checkbox" id="rememberMe" checked>
+                <span>Remember me</span>
+              </label>
+              <a href="javascript:void(0)" class="forgot-link" onclick="triggerToast('Password reset token generated!')">Forgot?</a>
+            </div>
+
+            <button type="submit" class="submit-btn" id="loginBtn">LOGIN</button>
+          </form>
+
+          <p class="switch-mode-text">
+            Don't have an account? 
+            <a role="button" tabindex="0" onclick="switchAuthView('signup')">Sign Up</a>
+          </p>
+        </div>
+
+        <!-- SIGN UP FORM -->
+        <div class="form-panel" id="signupPanel">
+          <h1 class="neon-title">SIGN UP</h1>
+          <p class="sub-title">Create your account</p>
+
+          <form id="signupForm" onsubmit="handleAuthSubmit(event, 'signup')">
+            <div class="input-group">
+              <input 
+                type="text" 
+                id="signupName"
+                class="auth-input" 
+                placeholder="Full Name" 
+                required
+                autocomplete="name"
+              >
+            </div>
+
+            <div class="input-group">
+              <input 
+                type="email" 
+                class="auth-input" 
+                placeholder="Email Address" 
+                required
+                autocomplete="email"
+              >
+            </div>
+
+            <div class="input-group">
+              <input 
+                type="password" 
+                id="signupPassword" 
+                class="auth-input has-icon" 
+                placeholder="Password" 
+                required
+                autocomplete="new-password"
+              >
+              <button 
+                type="button" 
+                class="toggle-password" 
+                onclick="togglePassword('signupPassword', this)" 
+                aria-label="Toggle password visibility"
+                title="Show password"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
+
+            <button type="submit" class="submit-btn" id="signupBtn">CREATE ACCOUNT</button>
+          </form>
+
+          <p class="switch-mode-text">
+            Already have an account? 
+            <a role="button" tabindex="0" onclick="switchAuthView('login')">Login</a>
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer(false)"></div>
+  <aside class="side-drawer" id="sideDrawer" aria-label="User Options and Chat History">
+    <div class="drawer-header">
+      <h3>NEURAL MENU</h3>
+      <button class="close-drawer-btn" onclick="toggleDrawer(false)" aria-label="Close menu">&times;</button>
+    </div>
+
+    <!-- User Profile Card -->
+    <div class="profile-card">
+      <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">
+      <div class="avatar-wrapper" onclick="document.getElementById('avatarFileInput').click()" title="Click to upload profile picture">
+        <img id="userAvatarImg" class="avatar-img" src="https://api.dicebear.com/7.x/bottts/svg?seed=SomuMatrix&backgroundColor=00ffff" alt="User Avatar">
+        <div class="avatar-upload-overlay">UPLOAD</div>
+      </div>
+      <div class="profile-info">
+        <div class="profile-name" id="drawerUserName">Coding SOMU</div>
+        <div class="profile-role">
+          <span class="neon-dot" style="width:6px;height:6px;"></span>
+          Cyberpunk Master
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <button class="new-chat-btn" onclick="createNewChatSession()">
+      <span>+</span> New Chat Session
+    </button>
+
+    <input type="text" id="chatSearchInput" class="search-chats-input" placeholder="🔍 Search chat archives..." oninput="filterChatHistory()">
+
+    <div class="chat-history-title">Stored Memory Streams</div>
+    <div class="chat-history-list" id="chatHistoryContainer"></div>
+
+    <div class="drawer-footer">
+      <button class="drawer-logout-btn" onclick="handleLogout()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+        Disconnect / Logout
+      </button>
+    </div>
+  </aside>
+
+  <main class="dashboard-view" id="dashboardScreen" aria-label="AI Platform Dashboard">
+    <header class="dash-header">
+      <div class="brand-logo">
+        <div class="brand-icon"><span></span></div>
+        <span class="brand-text">CODING SOMU AI</span>
+      </div>
+
+      <nav class="nav-tabs" role="tablist">
+        <button class="tab-btn active" onclick="switchTab('chatTab', this)">
+          <span>🤖</span> AI Chat & Web
+        </button>
+        <button class="tab-btn" onclick="switchTab('promptTab', this)">
+          <span>🎨</span> Prompt Gen
+        </button>
+        <button class="tab-btn" onclick="switchTab('toolsTab', this)">
+          <span>⚡</span> AI Tools
+        </button>
+      </nav>
+
+      <div class="header-actions">
+        <div class="status-pill">
+          <span class="neon-dot" style="width:6px;height:6px;"></span> GPT-4o / Gemini Flash
+        </div>
+        
+        <!-- 3-Dot Side Menu Trigger Button -->
+        <button class="menu-trigger-btn" onclick="toggleDrawer(true)" aria-label="Open User Menu" title="Neural Options">
+          <div class="dots-icon">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </button>
+      </div>
+    </header>
+
+    <div class="workspace-area">
+      <!-- 1. AI Chatbot Tab -->
+      <section class="tab-content active" id="chatTab">
+        <div class="chat-container">
+          
+          <!-- Message history -->
+          <div class="chat-messages" id="chatBox">
+            
+            <!-- ChatGPT style "What's on your mind today?" Hero Section -->
+            <div class="chat-hero-section" id="chatHero">
+              <h2 class="chat-hero-title">What’s on your mind today?</h2>
+              <p class="chat-hero-sub">Ask factual questions with live Google search or generate photorealistic AI imagery.</p>
+            </div>
+
+          </div>
+
+          <!-- Quick Prompts Chips -->
+          <div class="quick-chips-bar" id="quickChipsBar">
+            <button class="chip-btn" onclick="sendQuickPrompt('Latest artificial intelligence news and breakthroughs this week')">🌐 Latest AI Breakthroughs</button>
+            <button class="chip-btn" onclick="sendQuickPrompt('Generate image of futuristic neon cyberpunk supercar in Tokyo rain')">🎨 Draw Cyber Supercar</button>
+            <button class="chip-btn" onclick="sendQuickPrompt('Explain quantum computing algorithms in simple terms')">⚛️ Quantum Algorithms</button>
+            <button class="chip-btn" onclick="sendQuickPrompt('Generate image of glowing bioluminescent robotic owl in dark forest')">🦉 Draw Robo-Owl</button>
+          </div>
+
+          <!-- THE CHATGPT PILL SEARCH BAR -->
+          <div class="chatgpt-input-container">
+            
+            <!-- + Popup Menu for options -->
+            <div class="attach-popup-menu" id="attachMenu">
+              <button class="attach-menu-item" onclick="selectAttachTool('image')">
+                <span>🎨</span> Create AI Image
+              </button>
+              <button class="attach-menu-item" onclick="selectAttachTool('search')">
+                <span id="searchMenuIcon">🌐</span> <span id="searchMenuLabel">Web Search: Enabled</span>
+              </button>
+              <button class="attach-menu-item" onclick="selectAttachTool('code')">
+                <span>💻</span> Code Optimizer
+              </button>
+            </div>
+
+            <form class="chatgpt-pill-box" onsubmit="handleChatSubmit(event)">
+              <!-- Left "+" button -->
+              <button type="button" class="attach-plus-btn" id="attachBtn" onclick="toggleAttachMenu(event)" title="Add tools & modes" aria-label="Add tools">
+                +
+              </button>
+
+              <!-- Central Input Field -->
+              <input 
+                type="text" 
+                id="chatUserInput" 
+                class="chatgpt-text-input" 
+                placeholder="Ask anything" 
+                autocomplete="off"
+                oninput="handleInputState(this)"
+              >
+
+              <!-- Right Action Items -->
+              <div class="chatgpt-right-actions">
+                
+                <!-- Think (Deep reasoning) Toggle Button with Brain Icon -->
+                <button type="button" class="think-toggle-btn" id="thinkBtn" onclick="toggleThinkMode(this)" title="Toggle Deep Reasoning (Think mode)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-5.04z"></path>
+                    <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-5.04z"></path>
+                  </svg>
+                  <span>Think</span>
+                </button>
+
+                <!-- Microphone Button -->
+                <button type="button" class="mic-icon-btn" id="micBtn" onclick="toggleVoiceDictation(this)" title="Voice dictation" aria-label="Microphone">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                    <line x1="8" y1="23" x2="16" y2="23"></line>
+                  </svg>
+                </button>
+
+                <!-- Blue Circular Action Button (Waveform / Transmit) -->
+                <button type="submit" class="voice-action-btn" id="voiceActionBtn" title="Voice Mode / Send message" aria-label="Send or voice mode">
+                  <!-- Default ChatGPT-style Sound Waveform icon -->
+                  <svg id="voiceWaveIcon" viewBox="0 0 24 24">
+                    <path d="M12 3v18M8 8v8M16 8v8M4 11v2M20 11v2" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+                  </svg>
+                  <!-- Arrow Send icon when text is typed -->
+                  <svg id="sendArrowIcon" viewBox="0 0 24 24" style="display:none; fill:white;">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                  </svg>
+                </button>
+
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- 2. Image Prompt Generator Tab -->
+      <section class="tab-content" id="promptTab">
+        <div class="prompt-studio-grid">
+          <div class="studio-card">
+            <h3><span>⚡</span> Prompt Synthesizer</h3>
+            <div class="studio-form-group">
+              <label class="studio-label">Core Subject / Concept</label>
+              <input type="text" id="subjectInput" class="studio-select" placeholder="e.g., A cybernetic samurai in rain">
+            </div>
+
+            <div class="studio-form-group">
+              <label class="studio-label">Visual Style</label>
+              <select id="styleSelect" class="studio-select" onchange="updateGeneratedPrompt()">
+                <option value="Cyberpunk Neon Noir">Cyberpunk Neon Noir</option>
+                <option value="Hyper-realistic Unreal Engine 5">Hyper-realistic Unreal Engine 5 Render</option>
+                <option value="Anime Makoto Shinkai aesthetic">Anime Aesthetic (Makoto Shinkai)</option>
+                <option value="Synthwave 80s Retro Glow">Synthwave 80s Retro Glow</option>
+              </select>
+            </div>
+
+            <div class="studio-form-group">
+              <label class="studio-label">Lighting & Atmosphere</label>
+              <div class="tag-selector-group" id="lightingTags">
+                <span class="tag-choice selected" onclick="toggleTag(this)">Volumetric Fog</span>
+                <span class="tag-choice selected" onclick="toggleTag(this)">Cyan & Magenta Glow</span>
+                <span class="tag-choice" onclick="toggleTag(this)">Raytracing Reflections</span>
+                <span class="tag-choice selected" onclick="toggleTag(this)">Bioluminescent Accents</span>
+              </div>
+            </div>
+
+            <button class="submit-btn" style="width:100%; margin-top:14px;" onclick="updateGeneratedPrompt()">GENERATE PROMPT</button>
+          </div>
+
+          <div class="studio-card">
+            <h3><span>💎</span> Output Engine (Midjourney & SDXL)</h3>
+            <div class="prompt-output-box" id="finalPromptBox">
+              <button class="copy-output-btn" onclick="copyPromptText()">Copy Prompt</button>
+              <span id="promptContent">A futuristic cybernetic cyborg wandering illuminated neon backstreets of Neo Dhaka, torrential drizzle, cinematic 35mm lens, volumetric atmospheric fog, cyan and magenta glow, 8k resolution, octane render --ar 16:9 --v 6.1</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. AI Tools Tab -->
+      <section class="tab-content" id="toolsTab">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px;">
+          <div class="studio-card">
+            <h3>Neural Code Auditor</h3>
+            <textarea id="codeInput" class="studio-textarea" placeholder="Paste snippet to inspect logic..."></textarea>
+            <button class="submit-btn" style="width:100%;" onclick="runCodeExplainer()">Analyze</button>
+            <div class="msg-code" id="codeResult" style="display:none; max-height:120px; overflow-y:auto;"></div>
+          </div>
+          <div class="studio-card">
+            <h3>Viral Cyber Synthesizer</h3>
+            <input type="text" id="socialTopic" class="studio-select" placeholder="Topic: e.g. Launching AI Web App">
+            <button class="submit-btn" style="width:100%;" onclick="runPostGenerator()">Generate Hook</button>
+            <div class="msg-bubble" id="postResult" style="display:none; margin-top:8px;"></div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-brand">
+      <span class="neon-dot"></span>
+      <p>&copy; 2026 <strong>Coding SOMU</strong>. All rights reserved.</p>
+    </div>
+
+    <ul class="footer-links">
+      <li><a href="javascript:void(0)" onclick="triggerToast('Privacy Protocol encrypted.')">Privacy Policy</a></li>
+      <li><a href="javascript:void(0)" onclick="triggerToast('Terms of Service up to date.')">Terms of Service</a></li>
+      <li><a href="javascript:void(0)" onclick="triggerToast('Neural core support active.')">Support</a></li>
+      <li><a href="javascript:void(0)" onclick="triggerToast('Contact: somu@coding.ai')">Contact</a></li>
+    </ul>
+
+    <div class="footer-socials">
+      <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="GitHub">
+        <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      </a>
+      <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="Twitter">
+        <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </a>
+      <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="LinkedIn">
+        <svg viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+      </a>
+    </div>
+  </footer>
+
+  <div id="toastNotification" class="toast-msg" role="status" aria-live="polite">Done!</div>
+
+</body>
+
+<script src="JS/main.js"></script>
+</html>
